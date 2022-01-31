@@ -1,0 +1,78 @@
+
+
+service: procesoSeleccionBack
+
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+  region: 'us-east-1'
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:us-east-1:306192109948:table/RegistroCandidatos
+        
+  
+
+
+functions:
+  crearCandidato:
+    handler: src/addCandidato.addCandidato
+    events:
+      - httpApi:
+          path: /candidato
+          method: post
+          cors: true
+  obtenerCandidato:
+    handler: src/getCandidato.getCandidato
+    events:
+      - httpApi:
+          path: /candidato
+          method: get
+          cors: true
+
+          
+  candidato:
+    handler: src/candidato.candidato
+    events:
+      - httpApi:
+          path: /candidato/{id}
+          method: get
+          cors: true
+  updateCandidato:
+    handler: src/updateCandidato.updateCandidato
+    events:
+      - httpApi:
+          path: /candidato/{id}
+          method: put
+          cors: true
+  deleteCandidato:
+    handler: src/deleteCandidato.deleteCandidato
+    events:
+      - httpApi:
+          path: /candidato/{id}
+          method: delete
+          cors: true
+
+plugins:
+  - serverless-offline
+
+resources:
+  Resources:
+    TaskTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: RegistroCandidatos
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
